@@ -137,7 +137,7 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
             batch,
             close
         ])
-        .setup(|app| {
+        .setup(|app, _api| {
             app.manage(ConfigState::default());
             Ok(())
         })

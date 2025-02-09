@@ -18,6 +18,7 @@ mod commands;
 mod common;
 mod error;
 mod types;
+use rusqlite::trace::{TraceEvent, TraceEventCodes};
 
 #[derive(Default)]
 struct ConfigState(Mutex<HashMap<String, Connection>>);
@@ -47,6 +48,18 @@ fn insert_connection(
     let contains_key = connections.contains_key(&name);
 
     if !contains_key {
+        connection.trace_v2(
+            TraceEventCodes::all(),
+            Some(|e| match e {
+                TraceEvent::Stmt(_s, sql) => {
+                    print!("SQL: {}", sql);
+                }
+                TraceEvent::Profile(_s, _d) => {}
+                TraceEvent::Row(_s) => {}
+                TraceEvent::Close(_db) => {}
+                _ => todo!(),
+            }),
+        );
         connections.insert(name.clone(), connection);
     }
 
